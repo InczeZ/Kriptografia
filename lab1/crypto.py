@@ -4,50 +4,162 @@ File: crypto.py
 ---------------
 Assignment 1: Cryptography
 Course: CS 41
-Name: <YOUR NAME>
+Name: Incze Zoltan
 SUNet: <SUNet ID>
 
 Replace this with a description of the program.
 """
+import math
 import utils
 
 # Caesar Cipher
 
 def encrypt_caesar(plaintext):
-    """Encrypt plaintext using a Caesar cipher.
-
-    Add more implementation details here.
-    """
-    raise NotImplementedError  # Your implementation here
-
+    chipertext = ""
+    for letter in plaintext:
+        if not letter.isalpha():
+            chipertext += letter
+        elif letter >= 'X':
+            chipertext += chr(ord(letter) -23)
+        else:
+            chipertext += chr(ord(letter) + 3)
+            
+    return chipertext
 
 def decrypt_caesar(ciphertext):
-    """Decrypt a ciphertext using a Caesar cipher.
+    plaintext = ""
+    for letter in ciphertext:
+        if not letter.isalpha():
+            plaintext += letter
+        elif letter <= 'C':
+            plaintext += chr(ord(letter) + 23)
+        else:
+            plaintext += chr(ord(letter) - 3)
 
-    Add more implementation details here.
-    """
-    raise NotImplementedError  # Your implementation here
+    return plaintext
 
-
-# Vigenere Cipher
 
 def encrypt_vigenere(plaintext, keyword):
-    """Encrypt plaintext using a Vigenere cipher with a keyword.
+    new_keyword = ''
+    i = 0
+    for _ in plaintext:
+        if i == len(keyword):
+            i = 0
+        new_keyword += keyword[i]
+        i += 1
+    
+    cipertext = ""
+    for letter, keyword_letter in zip(plaintext, new_keyword):
+        if not letter.isalpha():
+            cipertext += letter
+        else:
+            cipertext += chr((ord(letter) + ord(keyword_letter)) % 26 + 65)
 
-    Add more implementation details here.
-    """
-    raise NotImplementedError  # Your implementation here
+    return cipertext
 
 
 def decrypt_vigenere(ciphertext, keyword):
-    """Decrypt ciphertext using a Vigenere cipher with a keyword.
+    new_keyword = ''
+    i = 0
+    for _ in ciphertext:
+        if i == len(keyword):
+            i = 0
+        new_keyword += keyword[i]
+        i += 1
 
-    Add more implementation details here.
-    """
-    raise NotImplementedError  # Your implementation here
+    plaintext = ""
+    for letter, keyword_letter in zip(ciphertext, new_keyword):
+        if not letter.isalpha():
+            plaintext += letter
+        else:
+            plaintext += chr((ord(letter) - (ord(keyword_letter))) % 26 + 65)
+
+    return plaintext
 
 
-# Merkle-Hellman Knapsack Cryptosystem
+def encrypt_scytale(plaintext, circumference):
+    cipertexts = [''] * circumference
+    i = 0
+    while i < len(plaintext):
+        for j in range(circumference):
+            if i < len(plaintext):
+                cipertexts[j] += plaintext[i]
+                i += 1 
+    return ''.join(cipertexts)
+ 
+def decrypt_scytale(ciphertext, circumference):
+    num_rows = math.ceil(len(ciphertext) / circumference)
+    num_full_columns = len(ciphertext) % circumference
+    
+    rows = [''] * num_rows
+    
+    index = 0
+    for column in range(circumference):
+        for row in range(num_rows):
+            if row < num_rows - 1 or column < num_full_columns or num_full_columns == 0:
+                rows[row] += ciphertext[index]
+                index += 1
+
+    return ''.join(rows)
+
+def encrypt_railfence(plaintext, num_rails):
+    ciphertexts = num_rails * ['']
+    i = 0
+    j = 0
+    while i < len(plaintext):
+        for j in range(num_rails):
+            if i < len(plaintext):
+                ciphertexts[j] += plaintext[i]
+                i += 1
+            else:
+                break
+        for j in range(num_rails - 2, 0, -1):
+            if i < len(plaintext):
+                ciphertexts[j] += plaintext[i]
+                i += 1
+            else:
+                break
+    
+    ciphertext = ''.join(ciphertexts)
+    return ciphertext
+
+def construct_matrix(num_rails, length):
+    matrix = [['' for _ in range(length)] for _ in range(num_rails)]
+    i = 0
+    down = True
+    for ind in range(length):
+        matrix[i][ind] = '*'
+        if down:
+            i += 1
+        else:
+            i -= 1
+        if i == 0 or i == num_rails - 1:
+            down = not down
+    return matrix
+
+def decrypt_railfence(ciphertext, num_rails):
+    matrix = construct_matrix(num_rails, len(ciphertext))
+
+    index = 0
+    for r in range(num_rails):
+        for c in range(len(ciphertext)):
+            if matrix[r][c] == '*' and index < len(ciphertext):
+                matrix[r][c] = ciphertext[index]
+                index += 1
+
+    plaintext = []
+    i = 0
+    down = True
+    for col in range(len(ciphertext)):
+        plaintext.append(matrix[i][col])
+        if down:
+            i += 1
+        else:
+            i -= 1
+        if i == 0 or i == num_rails - 1:
+            down = not down
+
+    return ''.join(plaintext)
 
 def generate_private_key(n=8):
     """Generate a private key for use in the Merkle-Hellman Knapsack Cryptosystem.

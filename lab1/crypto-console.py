@@ -11,6 +11,8 @@ import random
 
 from crypto import (encrypt_caesar, decrypt_caesar,
                     encrypt_vigenere, decrypt_vigenere,
+                    encrypt_scytale, decrypt_scytale,
+                    encrypt_railfence, decrypt_railfence,
                     generate_private_key, create_public_key,
                     encrypt_mh, decrypt_mh)
 
@@ -21,7 +23,7 @@ from crypto import (encrypt_caesar, decrypt_caesar,
 
 def get_tool():
     print("* Tool *")
-    return _get_selection("(C)aesar, (V)igenere or (M)erkle-Hellman? ", "CVM")
+    return _get_selection("(C)aesar, (V)igenere, (S)cytale, (R)ailfence or (M)erkle-Hellman? ", "CVSRM")
 
 
 def get_action():
@@ -129,7 +131,21 @@ def run_vigenere():
     output = (encrypt_vigenere if encrypting else decrypt_vigenere)(data, keyword)
 
     set_output(output)
-
+    
+def run_scytale():
+    action = get_action()
+    encrypting = action == 'E'
+    data = get_input(binary=False)
+    
+    print("* Transform *")
+    circumfence = int(input("Circumfence? "))
+    
+    print("{}crypting {} using Scytale cipher with {} circumfence...".format('En' if encrypting else 'De', data, circumfence))
+    
+    output = (encrypt_scytale if encrypting else decrypt_scytale)(data, circumfence)
+    
+    set_output(output)
+    
 
 def run_merkle_hellman():
     action = get_action()
@@ -160,6 +176,19 @@ def run_merkle_hellman():
 
     set_output(output)
 
+def run_railfence():
+    action = get_action()
+    encrypting = action == 'E'
+    data = get_input(binary=False)
+
+    print("* Transform *")
+    rail = int(input("Number of rails? "))
+
+    print("{}crypting {} using Railfence cipher with {} rails...".format('En' if encrypting else 'De', data, rail))
+
+    output = (encrypt_railfence if encrypting else decrypt_railfence)(data, rail)
+
+    set_output(output)
 
 def run_suite():
     """
@@ -175,7 +204,9 @@ def run_suite():
     commands = {
         'C': run_caesar,         # Caesar Cipher
         'V': run_vigenere,       # Vigenere Cipher
-        'M': run_merkle_hellman  # Merkle-Hellman Knapsack Cryptosystem
+        'S': run_scytale,        # Scytale Cipher
+        'R': run_railfence,      # Railfence Cipher
+        'M': run_merkle_hellman # Merkle-Hellman Knapsack Cryptosystem
     }
     commands[tool]()
 
