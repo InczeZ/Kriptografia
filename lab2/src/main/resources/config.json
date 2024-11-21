@@ -1,0 +1,7 @@
+{
+  "blockSize": 8,
+  "algorithm": "Vigenere",
+  "key": "0123456789ABCDEF",
+  "mode": "ECB",
+  "iv": "0001020304050607"
+}
